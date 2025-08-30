@@ -6,17 +6,20 @@
     <title>JoinLSSD</title>
     <style>
         :root {
-            --primary-color: #6d8a6f;
-            --primary-light: #3d4d3e;
-            --secondary-color: #2a2d2a;
-            --background-color: #1e201e;
-            --surface-color: #242724;
-            --border-color: #3a403a;
-            --text-color: #e2e8e2;
-            --text-light: #a0b0a0;
+            --primary-color: #4a674c;
+            --primary-light: #e8f5e9;
+            --secondary-color: #f5f5f5;
+            --background-color: #ffffff;
+            --surface-color: #fafafa;
+            --border-color: #dddddd;
+            --text-color: #333333;
+            --text-light: #666666;
             --error-color: #e74c3c;
             --success-color: #27ae60;
-            --hover-color: #354135;
+            --hover-color: #e0e0e0;
+            --copy-btn-bg: #4a674c;
+            --copy-btn-hover: #3a523c;
+            --copy-btn-text: #ffffff;
         }
         
         * {
@@ -39,7 +42,7 @@
             margin: 0 auto;
             background: var(--surface-color);
             border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             padding: 25px;
         }
         
@@ -178,7 +181,7 @@
         }
         
         button:hover {
-            background-color: #5a735c;
+            background-color: #3a523c;
         }
         
         button.secondary {
@@ -210,8 +213,8 @@
             width: 100%;
             min-height: 250px;
             padding: 12px;
-            background-color: #1a1c1a;
-            color: #c8d4c8;
+            background-color: #f0f0f0;
+            color: #333;
             border-radius: 4px;
             font-family: monospace;
             white-space: pre-wrap;
@@ -222,12 +225,13 @@
         }
         
         .copy-btn {
-            background-color: var(--primary-light);
+            background-color: var(--copy-btn-bg);
+            color: var(--copy-btn-text);
             margin-top: 10px;
         }
         
         .copy-btn:hover {
-            background-color: #324233;
+            background-color: var(--copy-btn-hover);
         }
         
         .required {
@@ -316,10 +320,63 @@
         .theme-toggle:hover {
             background: var(--hover-color);
         }
+        
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-color);
+            display: none;
+        }
+        
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .instructions a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .instructions a:hover {
+            text-decoration: underline;
+        }
+        
+        .topic-title {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            font-family: monospace;
+            font-size: 13px;
+        }
+        
+        .topic-output {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-color);
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <button class="theme-toggle" id="theme-toggle">Светлая тема</button>
+    <button class="theme-toggle" id="theme-toggle">Тёмная тема</button>
     
     <div class="container">
         <header>
@@ -529,11 +586,30 @@
                     <button type="button" id="generate-btn">Сгенерировать BB-код</button>
                 </div>
                 
+                <div class="topic-output" id="topic-output">
+                    <h2>НАЗВАНИЕ ТЕМЫ</h2>
+                    <p>Скопируйте название темы ниже:</p>
+                    <div class="topic-title" id="topic-title">Заявка в Академию LSSD - [Ваше Имя Фамилия]</div>
+                    <button type="button" id="copy-title-btn" class="copy-btn">Копировать название темы</button>
+                </div>
+                
                 <div class="output-container">
                     <h2>Сгенерированный BB-код</h2>
                     <p>Скопируйте код ниже и разместите его на форуме:</p>
                     <pre id="bbcode-output"></pre>
-                    <button type="button" id="copy-btn" class="copy-btn">Копировать в буфер обмена</button>
+                    <button type="button" id="copy-btn" class="copy-btn">Копировать BB-код</button>
+                </div>
+                
+                <div class="instructions" id="instructions">
+                    <h3>Инструкция по размещению заявки на форуме:</h3>
+                    <ol>
+                        <li>Скопируйте название темы выше</li>
+                        <li>Перейдите на <a href="https://sa-es.su/forums/195/" target="_blank">форум Академии LSSD</a></li>
+                        <li>Нажмите кнопку "Новая тема"</li>
+                        <li>Вставьте название темы в поле "Название темы"</li>
+                        <li>В появившемся окне редактора вставьте скопированный BB-код</li>
+                        <li>Нажмите кнопку "Создать тему" для публикации заявки</li>
+                    </ol>
                 </div>
             </div>
         </form>
@@ -617,12 +693,24 @@
                 const appDate = new Date(formData.get('application_date'));
                 const formattedDate = `${appDate.getDate().toString().padStart(2, '0')}/${(appDate.getMonth() + 1).toString().padStart(2, '0')}/${appDate.getFullYear()}`;
                 
+                const today = new Date();
+                const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                const day = today.getDate().toString().padStart(2, '0');
+                const datePrefix = `[${month}-${day}]`;
+                
+                const fullName = formData.get('fullname');
+                document.getElementById('topic-title').textContent = `${datePrefix} ${fullName}`;
+                
+                document.getElementById('topic-output').style.display = 'block';
+                
                 let bbcode = `[groups=8][box=#FFFFFF]\n\n[/box][box=#FFFFFF]\n\n[INDENT=3][IMG]https://i.imgur.com/aGHQgq3.png[/IMG][/INDENT]\n\n[CENTER]\n\n\n\n[color=#000000][B]КОМАНДЫВАНИЮ ПЕРСОНАЛОМ ЛССД\n\nТРЕНИРОВОЧНОЕ БЮРО\n\nАКАДЕМИЯ ПОМОЩНИКА ШЕРИФА[/color][/B][/CENTER]\n\n\n\n[box=#717f62]\n\nI. ОСНОВНАЯ ИНФОРМАЦИЯ\n\nИмя Фамилия:\n\n[a]${formData.get('fullname')}[/a]\n\n\n\nДата рождения:\n\n[a]${formData.get('birthdate')}[/a]\n\n\n\nПол:\n\n[a]${formData.get('gender')}[/a]\n\n\n\nНомер телефона:\n\n[a]${formData.get('phone')}[/a]\n\n\n\nАдрес проживания:\n\n[a]${formData.get('address')}[/a]\n\n\n\nII. ОСНОВНЫЕ ВОПРОСЫ\n\nРасовая/этническая принадлежность:\n\n[a]${formData.get('ethnicity')}[/a]\n\n\n\nЮридический статус вашего нахождения в стране (оставить один пункт):\n\n[a]${formData.get('legal_status')}[/a][a][/a]\n\n\n\nВаше образование (оставить один пункт):\n\n[a]${formData.get('education')}[/a][a][/a]\n\n\n\nИстория Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды):\n\n[a]${formData.get('criminal_history')}[/a]\n\n\n\nРазрешения и лицензии:\n\n[a]${formData.get('licenses')}[/a]\n\n\n\nПочему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов)\n\n[a]${formData.get('why_you')}[/a]\n\n\n\n\n\nДата: ${formattedDate}\n\nПодпись: ${formData.get('signature')}\n\n\n\n\n\n(( III. OOC Часть ))\n\n\n\nИмя\n\n[a]${formData.get('ooc_name')}[/a]\n\nВозраст\n\n[a]${formData.get('ooc_age')}[/a]\n\nЧасовой пояс\n\n[a]${formData.get('timezone')}[/a]\n\nПослужной список (фракции, их лидеры, должность и звание, дата и причина ухода)\n\n[a]${formData.get('faction_history')}[/a]\n\n\n\nСсылка на страницу в ВКонтакте (ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА)\n\n[a]${formData.get('vk_link')}[/a]\n\nCcылка на форумный аккаунт сервера (forum.gambit-rp.ru; профиль должен быть открыт)\n\n[a]${formData.get('forum_link')}[/a]\n\nПолный, необрезанный скриншот из личного кабинета всех персонажей на сервере Gambit RP\n\n[a]${formData.get('screenshot_chars')}[/a]\n\nСкриншот-подтверждение включённой двухфакторной аутентификации:\n\n[a]${formData.get('screenshot_2fa')}[/a]\n\nДоказательства игры (топики, СС; необязательно из полицейских фракций):\n\n[a]${formData.get('game_proof') || 'Не предоставлено'}[/a]\n\n\n\nИмеется ли доступ к TeamSpeak 3?:\n\n[a]${formData.get('teamspeak')}[/a]\n\n\n\nИмеется ли возможность беспрепятственно общатся в нём(микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3)?\n\n[a]${formData.get('teamspeak_communication')}[/a]\n\n\n\nКвента персонажа:\n\n[a]${formData.get('character_story')}[/a]\n\n\n\n[hr][/hr]\n\n(( Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции.\n\n\n\nВсё вышеуказанное мной является абсолютной правдой, которую заполнял лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции. ))\n\n\n\n[/box][groups]`;
                 
                 document.getElementById('bbcode-output').textContent = bbcode;
                 document.querySelector('.output-container').style.display = 'block';
                 
-                document.querySelector('.output-container').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('instructions').style.display = 'block';
+                
+                document.querySelector('.topic-output').scrollIntoView({ behavior: 'smooth' });
             });
             
             document.getElementById('copy-btn').addEventListener('click', function() {
@@ -637,37 +725,45 @@
                 alert('BB-код скопирован в буфер обмена!');
             });
             
+            document.getElementById('copy-title-btn').addEventListener('click', function() {
+                const topicTitle = document.getElementById('topic-title');
+                const textArea = document.createElement('textarea');
+                textArea.value = topicTitle.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                alert('Название темы скопировано в буфер обмена!');
+            });
+            
             const today = new Date();
             const formattedToday = today.toISOString().substr(0, 10);
             document.getElementById('application_date').value = formattedToday;
             
             const themeToggle = document.getElementById('theme-toggle');
-            let isDarkTheme = true;
+            let isDarkTheme = false;
             
             themeToggle.addEventListener('click', function() {
                 isDarkTheme = !isDarkTheme;
                 
                 if (isDarkTheme) {
-                    document.documentElement.style.setProperty('--primary-color', '#6d8a6f');
-                    document.documentElement.style.setProperty('--primary-light', '#3d4d3e');
-                    document.documentElement.style.setProperty('--secondary-color', '#2a2d2a');
-                    document.documentElement.style.setProperty('--background-color', '#1e201e');
-                    document.documentElement.style.setProperty('--surface-color', '#242724');
-                    document.documentElement.style.setProperty('--border-color', '#3a403a');
-                    document.documentElement.style.setProperty('--text-color', '#e2e8e2');
-                    document.documentElement.style.setProperty('--text-light', '#a0b0a0');
-                    document.documentElement.style.setProperty('--hover-color', '#354135');
+                    document.documentElement.style.setProperty('--background-color', '#1a1a1a');
+                    document.documentElement.style.setProperty('--surface-color', '#2a2a2a');
+                    document.documentElement.style.setProperty('--secondary-color', '#333333');
+                    document.documentElement.style.setProperty('--border-color', '#444444');
+                    document.documentElement.style.setProperty('--text-color', '#ffffff');
+                    document.documentElement.style.setProperty('--text-light', '#cccccc');
+                    document.documentElement.style.setProperty('--hover-color', '#444444');
                     themeToggle.textContent = 'Светлая тема';
                 } else {
-                    document.documentElement.style.setProperty('--primary-color', '#4a5c45');
-                    document.documentElement.style.setProperty('--primary-light', '#e9efe7');
-                    document.documentElement.style.setProperty('--secondary-color', '#f8f9fa');
-                    document.documentElement.style.setProperty('--background-color', '#f9f9f9');
-                    document.documentElement.style.setProperty('--surface-color', '#ffffff');
-                    document.documentElement.style.setProperty('--border-color', '#dee2e6');
-                    document.documentElement.style.setProperty('--text-color', '#2d3436');
-                    document.documentElement.style.setProperty('--text-light', '#636e72');
-                    document.documentElement.style.setProperty('--hover-color', '#e5e9ec');
+                    document.documentElement.style.setProperty('--background-color', '#ffffff');
+                    document.documentElement.style.setProperty('--surface-color', '#fafafa');
+                    document.documentElement.style.setProperty('--secondary-color', '#f5f5f5');
+                    document.documentElement.style.setProperty('--border-color', '#dddddd');
+                    document.documentElement.style.setProperty('--text-color', '#333333');
+                    document.documentElement.style.setProperty('--text-light', '#666666');
+                    document.documentElement.style.setProperty('--hover-color', '#e0e0e0');
                     themeToggle.textContent = 'Тёмная тема';
                 }
             });
