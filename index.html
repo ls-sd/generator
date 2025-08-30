@@ -459,7 +459,7 @@
         }
     </style>
 </head>
-<body class="dark-theme">   
+<body class="dark-theme">    
         
     <div class="container">
         <header style="position: relative;">
@@ -529,7 +529,7 @@
                         <label>Юридический статус вашего нахождения в страны: <span class="required">*</span></label>
                         <div class="radio-group">
                             <label><input type="radio" name="legal_status" value="Я гражданин США;" required> Я гражданин США</label>
-                            <label><input type="radio" name="legal_status" value="Я гражданин другого государства со статусом ожидания гражданства и имею право на работу;"> Я гражданин другого государства со статусом ожидания гражданства и имею право на работу</label>
+                            <label><input type="radio" name="legal_status" value="Я гражданин другого государства со статусом ожидания гражданства и имею право на работу;"> Я гражданин другого государства со статусом ожидания гражданства и имеею право на работу</label>
                             <label><input type="radio" name="legal_status" value="Другой вариант"> Другой вариант</label>
                         </div>
                     </div>
@@ -539,7 +539,7 @@
                         <div class="radio-group">
                             <label><input type="radio" name="education" value="Я окончил(-а) государственную американскую среднюю школу или частную школу, аккредитованную агентством, признанным Министерством образования США;" required> Я окончил(-а) государственную американскую среднюю школу или частную школу</label>
                             <label><input type="radio" name="education" value="Я получил(-а) диплом об общем образовании (GED) или эквивалент в институте США;"> Я получил(-а) диплом об общем образовании (GED)</label>
-                            <label><input type="radio" name="education" value="Я не окончил(-а) среднюю школу США или эквивалент, но я получил(-а) 2-летную (ассоциированный) или 4-летнею (бакалавр) степень в колледже или университете, аккreditованных агентством, признанным Министерством образования США;"> Я не окончил(-а) среднюю школу, но имею высшее образование</label>
+                            <label><input type="radio" name="education" value="Я не окончил(-а) среднюю школу США или эквивалент, но я получил(-а) 2-летную (ассоциированный) или 4-летнею (бакалавр) степень в колледже или университете, аккредитованных агентством, признанным Министерством образования США;"> Я не окончил(-а) среднюю школу, но имею высшее образование</label>
                             <label><input type="radio" name="education" value="Не один из пунктов выше мне не подходит(нет образования)"> Не один из пунктов выше мне не подходит (нет образования)</label>
                         </div>
                     </div>
@@ -678,10 +678,11 @@
                 <div class="button-group">
                     <button type="button" class="secondary prev-tab" data-prev="ooc">← Назад</button>
                     <button type="button" id="generate-btn">Сгенерировать BB-код</button>
+                    <button type="button" id="clear-form-btn" class="secondary" style="background-color: #e74c3c;">Очистить форму</button>
                 </div>
                 
                 <div class="topic-output" id="topic-output">
-                    <h2>НАЗВАНИЕ ТЕМЫ</h2>
+                    <h2>НАЗВАНИЕ ТЕМы</h2>
                     <p>Скопируйте название темы ниже:</p>
                     <div class="topic-title" id="topic-title">Заявка в Академию LSSD - [Ваше Имя Фамилия]</div>
                     <button type="button" id="copy-title-btn" class="copy-btn">Копировать название темы</button>
@@ -775,6 +776,77 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            function saveFormData() {
+                const formData = {};
+                document.querySelectorAll('#application-form input, #application-form select, #application-form textarea').forEach(input => {
+                    if (input.type !== 'radio' && input.type !== 'checkbox') {
+                        formData[input.name] = input.value;
+                    } else if (input.checked) {
+                        formData[input.name] = input.value;
+                    }
+                });
+                localStorage.setItem('lssd_application_form', JSON.stringify(formData));
+            }
+
+            function loadFormData() {
+                const savedData = localStorage.getItem('lssd_application_form');
+                if (savedData) {
+                    const formData = JSON.parse(savedData);
+                    
+                    Object.keys(formData).forEach(name => {
+                        const input = document.querySelector(`[name="${name}"]`);
+                        if (input) {
+                            if (input.type === 'radio' || input.type === 'checkbox') {
+                                const matchingInput = document.querySelector(`[name="${name}"][value="${formData[name]}"]`);
+                                if (matchingInput) {
+                                    matchingInput.checked = true;
+                                }
+                            } else {
+                                input.value = formData[name];
+                            }
+                        }
+                    });
+
+                    const whyYouTextarea = document.getElementById('why_you');
+                    if (whyYouTextarea && whyYouTextarea.value) {
+                        const text = whyYouTextarea.value.trim();
+                        const words = text === '' ? 0 : text.split(/\s+/).length;
+                        document.getElementById('word-count').textContent = `Слов: ${words}`;
+                        
+                        if (words < 70) {
+                            document.getElementById('word-count').classList.add('error');
+                            document.getElementById('word-count').classList.remove('success');
+                        } else {
+                            document.getElementById('word-count').classList.remove('error');
+                            document.getElementById('word-count').classList.add('success');
+                        }
+                    }
+                }
+            }
+
+            document.querySelectorAll('#application-form input, #application-form select, #application-form textarea').forEach(input => {
+                input.addEventListener('input', saveFormData);
+                input.addEventListener('change', saveFormData);
+            });
+
+            loadFormData();
+
+            document.getElementById('generate-btn').addEventListener('click', function() {
+                localStorage.removeItem('lssd_application_form');
+            });
+
+            document.getElementById('clear-form-btn').addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите очистить все данные формы?')) {
+                    document.getElementById('application-form').reset();
+                    localStorage.removeItem('lssd_application_form');
+                    
+                    document.getElementById('word-count').textContent = 'Слов: 0';
+                    document.getElementById('word-count').classList.remove('error', 'success');
+                    
+                    showSuccess('Форма успешно очищена');
+                }
+            });
+
             const tabs = document.querySelectorAll('.tab');
             const tabContents = document.querySelectorAll('.tab-content');
             
@@ -871,7 +943,7 @@
                 
                 document.getElementById('topic-output').style.display = 'block';
                 
-                let bbcode = `[groups=8][box=#FFFFFF]\n\n[/box][box=#FFFFFF]\n\n[INDENT=3][IMG]https://i.imgur.com/aGHQgq3.png[/IMG][/INDENT]\n\n[CENTER]\n\n\n\n[color=#000000][B]КОМАНДЫВАНИЮ ПЕРСОНАЛОМ ЛССД\n\nТРЕНИРОВОЧНОЕ БЮРО\n\nАКАДЕМИЯ ПОМОЩНИКА ШЕРИФА[/color][/B][/CENTER]\n\n\n\n[box=#717f62]\n\nI. ОСНОВНАЯ ИНФОРМАЦИЯ\n\nИмя Фамилия:\n\n[a]${formData.get('fullname')}[/a]\n\n\n\nДата рождения:\n\n[a]${formData.get('birthdate')}[/a]\n\n\n\nПол:\n\n[a]${formData.get('gender')}[/a]\n\n\n\nНомер телефона:\n\n[a]${formData.get('phone')}[/a]\n\n\n\nАдрес проживания:\n\n[a]${formData.get('address')}[/a]\n\n\n\nII. ОСНОВНЫЕ ВОПРОСЫ\n\nРасовая/этническая принадлежность:\n\n[a]${formData.get('ethnicity')}[/a]\n\n\n\nЮридический статус вашего нахождения в стране (оставить один пункт):\n\n[a]${formData.get('legal_status')}[/a][a][/a]\n\n\n\nВаше образование (оставить один пункт):\n\n[a]${formData.get('education')}[/a][a][/a]\n\n\n\nИстория Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды):\n\n[a]${formData.get('criminal_history')}[/a]\n\n\n\nРазрешения и лицензии:\n\n[a]${formData.get('licenses')}[/a]\n\n\n\nПочему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов)\n\n[a]${formData.get('why_you')}[/a]\n\n\n\n\n\nДата: ${formattedDate}\n\nПодпись: ${formData.get('signature')}\n\n\n\n\n\n(( III. OOC Часть ))\n\n\n\nИмя\n\n[a]${formData.get('ooc_name')}[/a]\n\nВозраст\n\n[a]${formData.get('ooc_age')}[/a]\n\nЧасовой пояс\n\n[a]${formData.get('timezone')}[/a]\n\nПослужной список (фракции, их лидеры, должность и звание, дата и причина ухода)\n\n[a]${formData.get('faction_history')}[/a]\n\n\n\nСсылка на страницу в ВКонтакте (ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА)\n\n[a]${formData.get('vk_link')}[/a]\n\nCcылка на форумный аккаунт сервера (forum.gambit-rp.ru; профиль должен быть открыт)\n\n[a]${formData.get('forum_link')}[/a]\n\nПолный, необрезанный скриншот из личного кабинета всех персонажей на сервере Gambit RP\n\n[a]${formData.get('screenshot_chars')}[/a]\n\nСкриншот-подтверждение включённой двухфакторной аутентификации:\n\n[a]${formData.get('screenshot_2fa')}[/a]\n\nДоказательства игры (топики, СС; необязательно из полицейских фракций):\n\n[a]${formData.get('game_profit') || 'Не предоставлено'}[/a]\n\n\n\nИмеется ли доступ к TeamSpeak 3?:\n\n[a]${formData.get('teamspeak')}[/a]\n\n\n\nИмеется ли возможность беспрепятственно общатся в нём(микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3)?\n\n[a]${formData.get('teamspeak_communication')}[/a]\n\n\n\nКвента персонажа:\n\n[a]${formData.get('character_story')}[/a]\n\n\n\n[hr][/hr]\n\n(( Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции. ))\n\n\n\n(( Всё вышеуказанное мной является абсолютной правдой, на которую соглашался лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции. ))\n\n[/box]\n\n[/box][/groups]`;
+                let bbcode = `[groups=8][box=#FFFFFF]\n\n[/box][box=#FFFFFF]\n\n[INDENT=3][IMG]https://i.imgur.com/aGHQgq3.png[/IMG][/INDENT]\n\n[CENTER]\n\n\n\n[color=#000000][B]КОМАНДЫВАНИЮ ПЕРСОНАЛОМ ЛССД\n\nТРЕНИРОВОЧНОЕ БЮРО\n\nАКАДЕМИЯ ПОМОЩНИКА ШЕРИФА[/color][/B][/CENTER]\n\n\n\n[box=#717f62]\n\nI. ОСНОВНАя ИНФОРМАЦИЯ\n\nИмя Фамилия:\n\n[a]${formData.get('fullname')}[/a]\n\n\n\nДата рождения:\n\n[a]${formData.get('birthdate')}[/a]\n\n\n\nПол:\n\n[a]${formData.get('gender')}[/a]\n\n\n\nНомер телефона:\n\n[a]${formData.get('phone')}[/a]\n\n\n\nАдрес проживания:\n\n[a]${formData.get('address')}[/a]\n\n\n\nII. ОСНОВНЫЕ ВОПРОСЫ\n\nРасовая/этническая принадлежность:\n\n[a]${formData.get('ethnicity')}[/a]\n\n\n\nЮридический статус вашего нахождения в стране (оставить один пункт):\n\n[a]${formData.get('legal_status')}[/a][a][/a]\n\n\n\nВаше образование (оставить один пункт):\n\n[a]${formData.get('education')}[/a][a][/a]\n\n\n\nИстория Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды):\n\n[a]${formData.get('criminal_history')}[/a]\n\n\n\nРазрешения и лицензии:\n\n[a]${formData.get('licenses')}[/a]\n\n\n\nПочему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов)\n\n[a]${formData.get('why_you')}[/a]\n\n\n\n\n\nДата: ${formattedDate}\n\nПодпись: ${formData.get('signature')}\n\n\n\n\n\n(( III. OOC Часть ))\n\n\n\nИмя\n\n[a]${formData.get('ooc_name')}[/a]\n\nВозраст\n\n[a]${formData.get('ooc_age')}[/a]\n\nЧасовой пояс\n\n[a]${formData.get('timezone')}[/a]\n\nПослужной список (фракции, их лидеры, должность и звание, дата и причина ухода)\n\n[a]${formData.get('faction_history')}[/a]\n\n\n\nСсылка на страницу в ВКонтакте (ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА)\n\n[a]${formData.get('vk_link')}[/a]\n\nCcылка на форумный аккаунт сервера (forum.gambit-rp.ru; профиль должен быть открыт)\n\n[a]${formData.get('forum_link')}[/a]\n\nПолный, необрезанный скриншот из личного кабинета всех персонажей на сервере Gambit RP\n\n[a]${formData.get('screenshot_chars')}[/a]\n\nСкриншот-подтверждение включённой двухфакторной аутентификации:\n\n[a]${formData.get('screenshot_2fa')}[/a]\n\nДоказательства игры (топики, СС; необязательно из полицейских фракций):\n\n[a]${formData.get('game_profit') || 'Не предоставлено'}[/a]\n\n\n\nИмеется ли доступ к TeamSpeak 3?:\n\n[a]${formData.get('teamspeak')}[/a]\n\n\n\nИмеется ли возможность беспрепятственно общатся в нём(микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3)?\n\n[a]${formData.get('teamspeak_communication')}[/a]\n\n\n\nКвента персонажа:\n\n[a]${formData.get('character_story')}[/a]\n\n\n\n[hr][/hr]\n\n(( Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции. ))\n\n\n\n(( Всё вышеуказанное мной является абсолютной правдой, на которую соглашался лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции. ))\n\n[/box]\n\n[/box][/groups]`;
                 
                 document.getElementById('bbcode-output').textContent = bbcode;
                 document.querySelector('.output-container').style.display = 'block';
