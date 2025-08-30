@@ -555,7 +555,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="why_you">Почему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов) <span class="required">*</span></label>
+                        <label for="why_you">Почему мы должны взять именно Вас? (Развёрнутый ответ, мин. 50 слов) <span class="required">*</span></label>
                         <textarea id="why_you" name="why_you" required></textarea>
                         <div id="word-count" class="word-count">Слов: 0</div>
                     </div>
@@ -682,9 +682,9 @@
                 </div>
                 
                 <div class="topic-output" id="topic-output">
-                    <h2>НАЗВАНИЕ ТЕМы</h2>
+                    <h2>НАЗВАНИЕ ТЕМЫ</h2>
                     <p>Скопируйте название темы ниже:</p>
-                    <div class="topic-title" id="topic-title">Заявка в Академию LSSD - [Ваше Имя Фамилия]</div>
+                    <div class="topic-title" id="topic-title">[09-25] Имя Фамилия</div>
                     <button type="button" id="copy-title-btn" class="copy-btn">Копировать название темы</button>
                 </div>
                 
@@ -813,7 +813,7 @@
                         const words = text === '' ? 0 : text.split(/\s+/).length;
                         document.getElementById('word-count').textContent = `Слов: ${words}`;
                         
-                        if (words < 70) {
+                        if (words < 50) {
                             document.getElementById('word-count').classList.add('error');
                             document.getElementById('word-count').classList.remove('success');
                         } else {
@@ -884,7 +884,7 @@
                 const words = text === '' ? 0 : text.split(/\s+/).length;
                 wordCount.textContent = `Слов: ${words}`;
                 
-                if (words < 70) {
+                if (words < 50) {
                     wordCount.classList.add('error');
                     wordCount.classList.remove('success');
                 } else {
@@ -917,8 +917,8 @@
                 }
                 
                 const whyYouWords = document.getElementById('why_you').value.trim().split(/\s+/).length;
-                if (whyYouWords < 70) {
-                    showError('Ответ на вопрос "Почему мы должны взять именно Вас?" должен содержать не менее 70 слов!');
+                if (whyYouWords < 50) {
+                    showError('Ответ на вопрос "Почему мы должны взять именно Вас?" должен содержать не менее 50 слов!');
                     document.querySelector('.tab[data-tab="questions"]').click();
                     return;
                 }
@@ -936,14 +936,106 @@
                 const today = new Date();
                 const month = (today.getMonth() + 1).toString().padStart(2, '0');
                 const day = today.getDate().toString().padStart(2, '0');
-                const datePrefix = `[${month}-${day}]`;
+                const datePrefix = `[09-25]`;
                 
                 const fullName = formData.get('fullname');
                 document.getElementById('topic-title').textContent = `${datePrefix} ${fullName}`;
                 
                 document.getElementById('topic-output').style.display = 'block';
                 
-                let bbcode = `[groups=8][box=#FFFFFF]\n\n[/box][box=#FFFFFF]\n\n[INDENT=3][IMG]https://i.imgur.com/aGHQgq3.png[/IMG][/INDENT]\n\n[CENTER]\n\n\n\n[color=#000000][B]КОМАНДЫВАНИЮ ПЕРСОНАЛОМ ЛССД\n\nТРЕНИРОВОЧНОЕ БЮРО\n\nАКАДЕМИЯ ПОМОЩНИКА ШЕРИФА[/color][/B][/CENTER]\n\n\n\n[box=#717f62]\n\nI. ОСНОВНАя ИНФОРМАЦИЯ\n\nИмя Фамилия:\n\n[a]${formData.get('fullname')}[/a]\n\n\n\nДата рождения:\n\n[a]${formData.get('birthdate')}[/a]\n\n\n\nПол:\n\n[a]${formData.get('gender')}[/a]\n\n\n\nНомер телефона:\n\n[a]${formData.get('phone')}[/a]\n\n\n\nАдрес проживания:\n\n[a]${formData.get('address')}[/a]\n\n\n\nII. ОСНОВНЫЕ ВОПРОСЫ\n\nРасовая/этническая принадлежность:\n\n[a]${formData.get('ethnicity')}[/a]\n\n\n\nЮридический статус вашего нахождения в стране (оставить один пункт):\n\n[a]${formData.get('legal_status')}[/a][a][/a]\n\n\n\nВаше образование (оставить один пункт):\n\n[a]${formData.get('education')}[/a][a][/a]\n\n\n\nИстория Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды):\n\n[a]${formData.get('criminal_history')}[/a]\n\n\n\nРазрешения и лицензии:\n\n[a]${formData.get('licenses')}[/a]\n\n\n\nПочему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов)\n\n[a]${formData.get('why_you')}[/a]\n\n\n\n\n\nДата: ${formattedDate}\n\nПодпись: ${formData.get('signature')}\n\n\n\n\n\n(( III. OOC Часть ))\n\n\n\nИмя\n\n[a]${formData.get('ooc_name')}[/a]\n\nВозраст\n\n[a]${formData.get('ooc_age')}[/a]\n\nЧасовой пояс\n\n[a]${formData.get('timezone')}[/a]\n\nПослужной список (фракции, их лидеры, должность и звание, дата и причина ухода)\n\n[a]${formData.get('faction_history')}[/a]\n\n\n\nСсылка на страницу в ВКонтакте (ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА)\n\n[a]${formData.get('vk_link')}[/a]\n\nCcылка на форумный аккаунт сервера (forum.gambit-rp.ru; профиль должен быть открыт)\n\n[a]${formData.get('forum_link')}[/a]\n\nПолный, необрезанный скриншот из личного кабинета всех персонажей на сервере Gambit RP\n\n[a]${formData.get('screenshot_chars')}[/a]\n\nСкриншот-подтверждение включённой двухфакторной аутентификации:\n\n[a]${formData.get('screenshot_2fa')}[/a]\n\nДоказательства игры (топики, СС; необязательно из полицейских фракций):\n\n[a]${formData.get('game_profit') || 'Не предоставлено'}[/a]\n\n\n\nИмеется ли доступ к TeamSpeak 3?:\n\n[a]${formData.get('teamspeak')}[/a]\n\n\n\nИмеется ли возможность беспрепятственно общатся в нём(микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3)?\n\n[a]${formData.get('teamspeak_communication')}[/a]\n\n\n\nКвента персонажа:\n\n[a]${formData.get('character_story')}[/a]\n\n\n\n[hr][/hr]\n\n(( Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции. ))\n\n\n\n(( Всё вышеуказанное мной является абсолютной правдой, на которую соглашался лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции. ))\n\n[/box]\n\n[/box][/groups]`;
+                let bbcode = `[groups=8][box=#FFFFFF]
+[INDENT=3][IMG]https://i.imgur.com/aGHQgq3.png[/IMG][/INDENT]
+
+[CENTER]
+[color=#000000][B]КОМАНДОВАНИЮ ПЕРСОНАЛОМ ЛССД
+ТРЕНИРОВОЧНОЕ БЮРО
+АКАДЕМИЯ ПОМОЩНИКА ШЕРИФА[/color][/B][/CENTER]
+
+[box=#717f62]
+I. ОСНОВНАЯ ИНФОРМАЦИЯ
+
+Имя Фамилия:
+[a]${formData.get('fullname')}[/a]
+
+Дата рождения:
+[a]${formData.get('birthdate')}[/a]
+
+Пол:
+[a]${formData.get('gender')}[/a]
+
+Номер телефона:
+[a]${formData.get('phone')}[/a]
+
+Адрес проживания:
+[a]${formData.get('address')}[/a]
+
+II. ОСНОВНЫЕ ВОПРОСЫ
+
+Расовая/этническая принадлежность:
+[a]${formData.get('ethnicity')}[/a]
+
+Юридический статус вашего нахождения в стране (оставить один пункт):
+[a]${formData.get('legal_status')}[/a][a][/a]
+
+Ваше образование (оставить один пункт):
+[a]${formData.get('education')}[/a][a][/a]
+
+История Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды):
+[a]${formData.get('criminal_history')}[/a]
+
+Разрешения и лицензии:
+[a]${formData.get('licenses')}[/a]
+
+Почему мы должны взять именно Вас? (Развёрнутый ответ, мин. 50 слов)
+[a]${formData.get('why_you')}[/a]
+
+Дата: ${formattedDate}
+Подпись: ${formData.get('signature')}
+
+(( III. OOC Часть ))
+
+Имя
+[a]${formData.get('ooc_name')}[/a]
+
+Возраст
+[a]${formData.get('ooc_age')}[/a]
+
+Часовой пояс
+[a]${formData.get('timezone')}[/a]
+
+Послужной список (фракции, их лидеры, должность и звание, дата и причина ухода)
+[a]${formData.get('faction_history')}[/a]
+
+Ссылка на страницу в ВКонтакте (ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА)
+[a]${formData.get('vk_link')}[/a]
+
+Ccылка на форумный аккаунт сервера (forum.gambit-rp.ru; профиль должен быть открыт)
+[a]${formData.get('forum_link')}[/a]
+
+Полный, необрезанный скриншот из личного кабинета всех персонажей на сервере Gambit RP
+[a]${formData.get('screenshot_chars')}[/a]
+
+Скриншот-подтверждение включённой двухфакторной аутентификации:
+[a]${formData.get('screenshot_2fa')}[/a]
+
+Доказательства игры (топики, СС; необязательно из полицейских фракций):
+[a]${formData.get('game_profit') || 'Не предоставлено'}[/a]
+
+Имеется ли доступ к TeamSpeak 3?:
+[a]${formData.get('teamspeak')}[/a]
+
+Имеется ли возможность беспрепятственно общатся в нём(микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3)?
+[a]${formData.get('teamspeak_communication')}[/a]
+
+Квента персонажа:
+[a]${formData.get('character_story')}[/a]
+
+[hr][/hr]
+(( Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции. ))
+
+(( Всё вышеуказанное мной является абсолютной правдой, на которую соглашался лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции. ))
+[/box]
+[/box][/groups]`;
                 
                 document.getElementById('bbcode-output').textContent = bbcode;
                 document.querySelector('.output-container').style.display = 'block';
