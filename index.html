@@ -22,7 +22,7 @@
             --copy-btn-text: #ffffff;
         }
         
-        body.dark-theme {
+		body.dark-theme {
             --primary-color: #7cb47e;
             --primary-light: #2c3e2d;
             --secondary-color: #2d2d2d;
@@ -35,6 +35,69 @@
             --copy-btn-bg: #7cb47e;
             --copy-btn-hover: #6aa36c;
         }
+		
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            max-width: 350px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .notification.success {
+            background-color: var(--success-color);
+            border-left: 4px solid #1e7e34;
+        }
+        
+        .notification.error {
+            background-color: var(--error-color);
+            border-left: 4px solid #c0392b;
+        }
+        
+        .notification.warning {
+            background-color: #f39c12;
+            border-left: 4px solid #e67e22;
+            color: #fff;
+        }
+        
+        .notification.info {
+            background-color: #3498db;
+            border-left: 4px solid #2980b9;
+        }
+        
+        .notification-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .notification-close {
+            margin-left: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .notification-close:hover {
+            opacity: 1;
+        }
+        
         * {
             box-sizing: border-box;
             margin: 0;
@@ -463,7 +526,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>Юридический статус вашего нахождения в стране: <span class="required">*</span></label>
+                        <label>Юридический статус вашего нахождения в страны: <span class="required">*</span></label>
                         <div class="radio-group">
                             <label><input type="radio" name="legal_status" value="Я гражданин США;" required> Я гражданин США</label>
                             <label><input type="radio" name="legal_status" value="Я гражданин другого государства со статусом ожидания гражданства и имею право на работу;"> Я гражданин другого государства со статусом ожидания гражданства и имею право на работу</label>
@@ -561,8 +624,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="game_proof">Доказательства игры (топики, СС; необязательно из полицейских фракций):</label>
-                        <textarea id="game_proof" name="game_proof" placeholder="Необязательное поле"></textarea>
+                        <label for="game_profit">Доказательства игры (топики, СС; необязательно из полицейских фракций):</label>
+                        <textarea id="game_profit" name="game_profit" placeholder="Необязательное поле"></textarea>
                     </div>
                     
                     <div class="form-group">
@@ -646,7 +709,71 @@
         </form>
     </div>
 
+    <div id="notification-container"></div>
+
     <script>
+        function showNotification(message, type = 'info', duration = 5000) {
+            const container = document.getElementById('notification-container');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'warning') icon = '⚠️';
+            
+            notification.innerHTML = `
+                <span class="notification-icon">${icon}</span>
+                <span class="notification-message">${message}</span>
+                <span class="notification-close">&times;</span>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                hideNotification(notification);
+            });
+            
+            if (duration > 0) {
+                setTimeout(() => {
+                    hideNotification(notification);
+                }, duration);
+            }
+            
+            return notification;
+        }
+        
+        function hideNotification(notification) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }
+        
+        function showSuccess(message, duration = 5000) {
+            return showNotification(message, 'success', duration);
+        }
+        
+        function showError(message, duration = 5000) {
+            return showNotification(message, 'error', duration);
+        }
+        
+        function showWarning(message, duration = 5000) {
+            return showNotification(message, 'warning', duration);
+        }
+        
+        function showInfo(message, duration = 5000) {
+            return showNotification(message, 'info', duration);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const tabs = document.querySelectorAll('.tab');
             const tabContents = document.querySelectorAll('.tab-content');
@@ -709,7 +836,7 @@
                 
                 const agreementCheckbox = document.getElementById('agreement');
                 if (!agreementCheckbox.checked) {
-                    alert('Вы должны подтвердить согласие с условиями перед генерацией заявки!');
+                    showError('Вы должны подтвердить согласие с условиями перед генерацией заявки!');
                     document.querySelector('.tab[data-tab="ooc"]').click();
                     agreementCheckbox.style.outline = '2px solid var(--error-color)';
                     return;
@@ -719,13 +846,13 @@
                 
                 const whyYouWords = document.getElementById('why_you').value.trim().split(/\s+/).length;
                 if (whyYouWords < 70) {
-                    alert('Ответ на вопрос "Почему мы должны взять именно Вас?" должен содержать не менее 70 слов!');
+                    showError('Ответ на вопрос "Почему мы должны взять именно Вас?" должен содержать не менее 70 слов!');
                     document.querySelector('.tab[data-tab="questions"]').click();
                     return;
                 }
                 
                 if (!allFilled) {
-                    alert('Пожалуйста, заполните все обязательные поля (отмечены красным)');
+                    showError('Пожалуйста, заполните все обязательные поля (отмечены красным)');
                     return;
                 }
                 
@@ -744,7 +871,7 @@
                 
                 document.getElementById('topic-output').style.display = 'block';
                 
-                let bbcode = `[groups=8][box=#FFFFFF]\n\n[/box][box=#FFFFFF]\n\n[INDENT=3][IMG]https://i.imgur.com/aGHQgq3.png[/IMG][/INDENT]\n\n[CENTER]\n\n\n\n[color=#000000][B]КОМАНДЫВАНИЮ ПЕРСОНАЛОМ ЛССД\n\nТРЕНИРОВОЧНОЕ БЮРО\n\nАКАДЕМИЯ ПОМОЩНИКА ШЕРИФА[/color][/B][/CENTER]\n\n\n\n[box=#717f62]\n\nI. ОСНОВНАЯ ИНФОРМАЦИЯ\n\nИмя Фамилия:\n\n[a]${formData.get('fullname')}[/a]\n\n\n\nДата рождения:\n\n[a]${formData.get('birthdate')}[/a]\n\n\n\nПол:\n\n[a]${formData.get('gender')}[/a]\n\n\n\nНомер телефона:\n\n[a]${formData.get('phone')}[/a]\n\n\n\nАдрес проживания:\n\n[a]${formData.get('address')}[/a]\n\n\n\nII. ОСНОВНЫЕ ВОПРОСЫ\n\nРасовая/этническая принадлежность:\n\n[a]${formData.get('ethnicity')}[/a]\n\n\n\nЮридический статус вашего нахождения в стране (оставить один пункт):\n\n[a]${formData.get('legal_status')}[/a][a][/a]\n\n\n\nВаше образование (оставить один пункт):\n\n[a]${formData.get('education')}[/a][a][/a]\n\n\n\nИстория Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды):\n\n[a]${formData.get('criminal_history')}[/a]\n\n\n\nРазрешения и лицензии:\n\n[a]${formData.get('licenses')}[/a]\n\n\n\nПочему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов)\n\n[a]${formData.get('why_you')}[/a]\n\n\n\n\n\nДата: ${formattedDate}\n\nПодпись: ${formData.get('signature')}\n\n\n\n\n\n(( III. OOC Часть ))\n\n\n\nИмя\n\n[a]${formData.get('ooc_name')}[/a]\n\nВозраст\n\n[a]${formData.get('ooc_age')}[/a]\n\nЧасовой пояс\n\n[a]${formData.get('timezone')}[/a]\n\nПослужной список (фракции, их лидеры, должность и звание, дата и причина ухода)\n\n[a]${formData.get('faction_history')}[/a]\n\n\n\nСсылка на страницу в ВКонтакте (ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА)\n\n[a]${formData.get('vk_link')}[/a]\n\nCcылка на форумный аккаунт сервера (forum.gambit-rp.ru; профиль должен быть открыт)\n\n[a]${formData.get('forum_link')}[/a]\n\nПолный, необрезанный скриншот из личного кабинета всех персонажей на сервере Gambit RP\n\n[a]${formData.get('screenshot_chars')}[/a]\n\nСкриншот-подтверждение включённой двухфакторной аутентификации:\n\n[a]${formData.get('screenshot_2fa')}[/a]\n\nДоказательства игры (топики, СС; необязательно из полицейских фракций):\n\n[a]${formData.get('game_proof') || 'Не предоставлено'}[/a]\n\n\n\nИмеется ли доступ к TeamSpeak 3?:\n\n[a]${formData.get('teamspeak')}[/a]\n\n\n\nИмеется ли возможность беспрепятственно общатся в нём(микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3)?\n\n[a]${formData.get('teamspeak_communication')}[/a]\n\n\n\nКвента персонажа:\n\n[a]${formData.get('character_story')}[/a]\n\n\n\n[hr][/hr]\n\n(( Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции. ))\n\n\n\n(( Всё вышеуказанное мной является абсолютной правдой, на которую соглашался лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции. ))\n\n[/box]\n\n[/box][/groups]`;
+                let bbcode = `[groups=8][box=#FFFFFF]\n\n[/box][box=#FFFFFF]\n\n[INDENT=3][IMG]https://i.imgur.com/aGHQgq3.png[/IMG][/INDENT]\n\n[CENTER]\n\n\n\n[color=#000000][B]КОМАНДЫВАНИЮ ПЕРСОНАЛОМ ЛССД\n\nТРЕНИРОВОЧНОЕ БЮРО\n\nАКАДЕМИЯ ПОМОЩНИКА ШЕРИФА[/color][/B][/CENTER]\n\n\n\n[box=#717f62]\n\nI. ОСНОВНАЯ ИНФОРМАЦИЯ\n\nИмя Фамилия:\n\n[a]${formData.get('fullname')}[/a]\n\n\n\nДата рождения:\n\n[a]${formData.get('birthdate')}[/a]\n\n\n\nПол:\n\n[a]${formData.get('gender')}[/a]\n\n\n\nНомер телефона:\n\n[a]${formData.get('phone')}[/a]\n\n\n\nАдрес проживания:\n\n[a]${formData.get('address')}[/a]\n\n\n\nII. ОСНОВНЫЕ ВОПРОСЫ\n\nРасовая/этническая принадлежность:\n\n[a]${formData.get('ethnicity')}[/a]\n\n\n\nЮридический статус вашего нахождения в стране (оставить один пункт):\n\n[a]${formData.get('legal_status')}[/a][a][/a]\n\n\n\nВаше образование (оставить один пункт):\n\n[a]${formData.get('education')}[/a][a][/a]\n\n\n\nИстория Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды):\n\n[a]${formData.get('criminal_history')}[/a]\n\n\n\nРазрешения и лицензии:\n\n[a]${formData.get('licenses')}[/a]\n\n\n\nПочему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов)\n\n[a]${formData.get('why_you')}[/a]\n\n\n\n\n\nДата: ${formattedDate}\n\nПодпись: ${formData.get('signature')}\n\n\n\n\n\n(( III. OOC Часть ))\n\n\n\nИмя\n\n[a]${formData.get('ooc_name')}[/a]\n\nВозраст\n\n[a]${formData.get('ooc_age')}[/a]\n\nЧасовой пояс\n\n[a]${formData.get('timezone')}[/a]\n\nПослужной список (фракции, их лидеры, должность и звание, дата и причина ухода)\n\n[a]${formData.get('faction_history')}[/a]\n\n\n\nСсылка на страницу в ВКонтакте (ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА)\n\n[a]${formData.get('vk_link')}[/a]\n\nCcылка на форумный аккаунт сервера (forum.gambit-rp.ru; профиль должен быть открыт)\n\n[a]${formData.get('forum_link')}[/a]\n\nПолный, необрезанный скриншот из личного кабинета всех персонажей на сервере Gambit RP\n\n[a]${formData.get('screenshot_chars')}[/a]\n\nСкриншот-подтверждение включённой двухфакторной аутентификации:\n\n[a]${formData.get('screenshot_2fa')}[/a]\n\nДоказательства игры (топики, СС; необязательно из полицейских фракций):\n\n[a]${formData.get('game_profit') || 'Не предоставлено'}[/a]\n\n\n\nИмеется ли доступ к TeamSpeak 3?:\n\n[a]${formData.get('teamspeak')}[/a]\n\n\n\nИмеется ли возможность беспрепятственно общатся в нём(микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3)?\n\n[a]${formData.get('teamspeak_communication')}[/a]\n\n\n\nКвента персонажа:\n\n[a]${formData.get('character_story')}[/a]\n\n\n\n[hr][/hr]\n\n(( Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции. ))\n\n\n\n(( Всё вышеуказанное мной является абсолютной правдой, на которую соглашался лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции. ))\n\n[/box]\n\n[/box][/groups]`;
                 
                 document.getElementById('bbcode-output').textContent = bbcode;
                 document.querySelector('.output-container').style.display = 'block';
@@ -758,6 +885,7 @@
                 navigator.clipboard.writeText(bbcodeOutput.textContent).then(() => {
                     const originalText = this.textContent;
                     this.textContent = 'Скопировано!';
+                    showSuccess('BB-код успешно скопирован в буфер обмена!');
                     setTimeout(() => {
                         this.textContent = originalText;
                     }, 2000);
@@ -769,6 +897,7 @@
                 navigator.clipboard.writeText(topicTitle.textContent).then(() => {
                     const originalText = this.textContent;
                     this.textContent = 'Скопировано!';
+                    showSuccess('Название темы успешно скопировано в буфер обмена!');
                     setTimeout(() => {
                         this.textContent = originalText;
                     }, 2000);
