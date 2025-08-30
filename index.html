@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор заявки - Академия Помощника Шерифа</title>
+    <style>
+        :root {
+            --primary-color: #6d8a6f;
+            --primary-light: #3d4d3e;
+            --secondary-color: #2a2d2a;
+            --background-color: #1e201e;
+            --surface-color: #242724;
+            --border-color: #3a403a;
+            --text-color: #e2e8e2;
+            --text-light: #a0b0a0;
+            --error-color: #e74c3c;
+            --success-color: #27ae60;
+            --hover-color: #354135;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--surface-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            padding: 25px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        .description {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .form-section {
+            background-color: var(--secondary-color);
+            padding: 18px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .form-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--text-color);
+        }
+        
+        .hint {
+            display: block;
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+            font-style: italic;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        input[type="tel"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 13px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            transition: border-color 0.2s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="tel"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        input[type="text"]::placeholder,
+        input[type="tel"]::placeholder,
+        textarea::placeholder {
+            color: var(--text-light);
+            opacity: 0.7;
+        }
+        
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .radio-group, .checkbox-group {
+            margin: 8px 0;
+        }
+        
+        .radio-group label, .checkbox-group label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        input[type="radio"], input[type="checkbox"] {
+            margin-right: 8px;
+            accent-color: var(--primary-color);
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #5a735c;
+        }
+        
+        button.secondary {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        button.secondary:hover {
+            background-color: var(--hover-color);
+        }
+        
+        .output-container {
+            margin-top: 25px;
+            padding: 18px;
+            background-color: var(--secondary-color);
+            border-radius: 6px;
+            display: none;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .output-container h2 {
+            margin-bottom: 12px;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+        
+        #bbcode-output {
+            width: 100%;
+            min-height: 250px;
+            padding: 12px;
+            background-color: #1a1c1a;
+            color: #c8d4c8;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow: auto;
+            font-size: 12px;
+            line-height: 1.4;
+            border: 1px solid var(--border-color);
+        }
+        
+        .copy-btn {
+            background-color: var(--primary-light);
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background-color: #324233;
+        }
+        
+        .required {
+            color: var(--error-color);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .word-count {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+        
+        .word-count.error {
+            color: var(--error-color);
+        }
+        
+        .word-count.success {
+            color: var(--success-color);
+        }
+        
+        .summary-item {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-label {
+            font-weight: 500;
+            color: var(--text-light);
+            font-size: 12px;
+        }
+        
+        .summary-value {
+            font-size: 13px;
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--hover-color);
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="theme-toggle">Светлая тема</button>
+    
+    <div class="container">
+        <header>
+            <h1>Генератор заявки в Академию Помощника Шерифа</h1>
+            <p class="description">Заполните все поля формы для генерации BB-кода для размещения на форуме</p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="main">Основная информация</div>
+            <div class="tab" data-tab="questions">Основные вопросы</div>
+            <div class="tab" data-tab="ooc">OOC информация</div>
+            <div class="tab" data-tab="generate">Генерация</div>
+        </div>
+        
+        <form id="application-form">
+            <div class="tab-content active" id="main-tab">
+                <div class="form-section">
+                    <h2>I. ОСНОВНАЯ ИНФОРМАЦИЯ</h2>
+                    
+                    <div class="form-group">
+                        <label for="fullname">Имя Фамилия: <span class="required">*</span></label>
+                        <input type="text" id="fullname" name="fullname" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="birthdate">Дата рождения: <span class="required">*</span></label>
+                        <input type="date" id="birthdate" name="birthdate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender">Пол: <span class="required">*</span></label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Выберите пол</option>
+                            <option value="Мужской">Мужской</option>
+                            <option value="Женский">Женский</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Номер телефона: <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">Адрес проживания: <span class="required">*</span></label>
+                        <input type="text" id="address" name="address" required>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <div></div> <!-- Empty div for spacing -->
+                    <button type="button" class="next-tab" data-next="questions">Далее →</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="questions-tab">
+                <div class="form-section">
+                    <h2>II. ОСНОВНЫЕ ВОПРОСЫ</h2>
+                    
+                    <div class="form-group">
+                        <label for="ethnicity">Расовая/этническая принадлежность: <span class="required">*</span></label>
+                        <input type="text" id="ethnicity" name="ethnicity" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Юридический статус вашего нахождения в стране: <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="legal_status" value="Я гражданин США;" required> Я гражданин США</label>
+                            <label><input type="radio" name="legal_status" value="Я гражданин другого государства со статусом ожидания гражданства и имею право на работу;"> Я гражданин другого государства со статусом ожидания гражданства и имею право на работу</label>
+                            <label><input type="radio" name="legal_status" value="Другой вариант"> Другой вариант</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ваше образование: <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="education" value="Я окончил(-а) государственную американскую среднюю школу или частную школу, аккредитованную агентством, признанным Министерством образования США;" required> Я окончил(-а) государственную американскую среднюю школу или частную школу</label>
+                            <label><input type="radio" name="education" value="Я получил(-а) диплом об общем образовании (GED) или эквивалент в институте США;"> Я получил(-а) диплом об общем образовании (GED)</label>
+                            <label><input type="radio" name="education" value="Я не окончил(-а) среднюю школу США или эквивалент, но я получил(-а) 2-летную (ассоциированный) или 4-летнею (бакалавр) степень в колледже или университете, аккreditованных агентством, признанным Министерством образования США;"> Я не окончил(-а) среднюю школу, но имею высшее образование</label>
+                            <label><input type="radio" name="education" value="Не один из пунктов выше мне не подходит(нет образования)"> Не один из пунктов выше мне не подходит (нет образования)</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="criminal_history">История Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды): <span class="required">*</span></label>
+                        <textarea id="criminal_history" name="criminal_history" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="licenses">Разрешения и лицензии: <span class="required">*</span></label>
+                        <textarea id="licenses" name="licenses" required placeholder="Указать все принадлежащие вам разрешения и лицензии"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="why_you">Почему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов) <span class="required">*</span></label>
+                        <textarea id="why_you" name="why_you" required></textarea>
+                        <div id="word-count" class="word-count">Слов: 0</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="application_date">Дата: <span class="required">*</span></label>
+                        <input type="date" id="application_date" name="application_date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signature">Подпись: <span class="required">*</span></label>
+                        <input type="text" id="signature" name="signature" required>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="secondary prev-tab" data-prev="main">← Назад</button>
+                    <button type="button" class="next-tab" data-next="ooc">Далее →</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="ooc-tab">
+                <div class="form-section">
+                    <h2>III. OOC Часть</h2>
+                    
+                    <div class="form-group">
+                        <label for="ooc_name">Имя: <span class="required">*</span></label>
+                        <input type="text" id="ooc_name" name="ooc_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ooc_age">Возраст: <span class="required">*</span></label>
+                        <input type="text" id="ooc_age" name="ooc_age" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="timezone">Часовой пояс: <span class="required">*</span></label>
+                        <input type="text" id="timezone" name="timezone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="faction_history">Послужной список (фракции, их лидеры, должность и звание, дата и причина ухода): <span class="required">*</span></label>
+                        <textarea id="faction_history" name="faction_history" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vk_link">Ссылка на страницу в ВКонтакте: <span class="required">*</span></label>
+                        <input type="text" id="vk_link" name="vk_link" required>
+                        <span class="hint">ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="forum_link">Ссылка на форумный аккаунт сервера: <span class="required">*</span></label>
+                        <input type="text" id="forum_link" name="forum_link" required>
+                        <span class="hint">forum.gambit-rp.ru; профиль должен быть открыт</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="screenshot_chars">Полный, необрезанный скриншот из личного кабинета всех персонажей: <span class="required">*</span></label>
+                        <input type="text" id="screenshot_chars" name="screenshot_chars" placeholder="Вставить ссылку на скриншот" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="screenshot_2fa">Скриншот-подтверждение включённой двухфакторной аутентификации: <span class="required">*</span></label>
+                        <input type="text" id="screenshot_2fa" name="screenshot_2fa" placeholder="Вставить ссылку на скриншот" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="game_proof">Доказательства игры (топики, СС; необязательно из полицейских фракций):</label>
+                        <textarea id="game_proof" name="game_proof" placeholder="Необязательное поле"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Имеется ли доступ к TeamSpeak 3?: <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="teamspeak" value="Да" required> Да</label>
+                            <label><input type="radio" name="teamspeak" value="Нет"> Нет</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Имеется ли возможность беспрепятственно общаться в нём?: <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="teamspeak_communication" value="Да" required> Да</label>
+                            <label><input type="radio" name="teamspeak_communication" value="Нет"> Нет</label>
+                        </div>
+                        <span class="hint">Микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="character_story">Квента персонажа: <span class="required">*</span></label>
+                        <textarea id="character_story" name="character_story" required></textarea>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="secondary prev-tab" data-prev="questions">← Назад</button>
+                    <button type="button" class="next-tab" data-next="generate">Сгенерировать BB-код</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="generate-tab">
+                <div class="form-section">
+                    <h2>Проверьте данные перед генерацией</h2>
+                    <p>Убедитесь, что все поля заполнены правильно. После генерации BB-кода вы сможете скопировать его для размещения на форуме.</p>
+                    
+                    <div id="summary"></div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="secondary prev-tab" data-prev="ooc">← Назад</button>
+                    <button type="button" id="generate-btn">Сгенерировать BB-код</button>
+                </div>
+                
+                <div class="output-container">
+                    <h2>Сгенерированный BB-код</h2>
+                    <p>Скопируйте код ниже и разместите его на форуме:</p>
+                    <pre id="bbcode-output"></pre>
+                    <button type="button" id="copy-btn" class="copy-btn">Копировать в буфер обмена</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            document.querySelectorAll('.next-tab').forEach(button => {
+                button.addEventListener('click', () => {
+                    const nextTab = button.getAttribute('data-next');
+                    document.querySelector(`.tab[data-tab="${nextTab}"]`).click();
+                });
+            });
+            
+            document.querySelectorAll('.prev-tab').forEach(button => {
+                button.addEventListener('click', () => {
+                    const prevTab = button.getAttribute('data-prev');
+                    document.querySelector(`.tab[data-tab="${prevTab}"]`).click();
+                });
+            });
+            
+            const whyYouTextarea = document.getElementById('why_you');
+            const wordCount = document.getElementById('word-count');
+            
+            whyYouTextarea.addEventListener('input', () => {
+                const text = whyYouTextarea.value.trim();
+                const words = text === '' ? 0 : text.split(/\s+/).length;
+                wordCount.textContent = `Слов: ${words}`;
+                
+                if (words < 70) {
+                    wordCount.classList.add('error');
+                    wordCount.classList.remove('success');
+                } else {
+                    wordCount.classList.remove('error');
+                    wordCount.classList.add('success');
+                }
+            });
+            
+            document.getElementById('generate-btn').addEventListener('click', function() {
+                const requiredFields = document.querySelectorAll('[required]');
+                let allFilled = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        allFilled = false;
+                        field.style.borderColor = 'var(--error-color)';
+                    } else {
+                        field.style.borderColor = '';
+                    }
+                });
+                
+                const whyYouWords = document.getElementById('why_you').value.trim().split(/\s+/).length;
+                if (whyYouWords < 70) {
+                    alert('Ответ на вопрос "Почему мы должны взять именно Вас?" должен содержать не менее 70 слов!');
+                    document.querySelector('.tab[data-tab="questions"]').click();
+                    return;
+                }
+                
+                if (!allFilled) {
+                    alert('Пожалуйста, заполните все обязательные поля (отмечены красным)');
+                    return;
+                }
+                
+                const formData = new FormData(document.getElementById('application-form'));
+                
+                const appDate = new Date(formData.get('application_date'));
+                const formattedDate = `${appDate.getDate().toString().padStart(2, '0')}/${(appDate.getMonth() + 1).toString().padStart(2, '0')}/${appDate.getFullYear()}`;
+                
+                let bbcode = `[groups=8][box=#FFFFFF]\n\n[/box][box=#FFFFFF]\n\n[INDENT=3][IMG]https://i.imgur.com/aGHQgq3.png[/IMG][/INDENT]\n\n[CENTER]\n\n\n\n[color=#000000][B]КОМАНДЫВАНИЮ ПЕРСОНАЛОМ ЛССД\n\nТРЕНИРОВОЧНОЕ БЮРО\n\nАКАДЕМИЯ ПОМОЩНИКА ШЕРИФА[/color][/B][/CENTER]\n\n\n\n[box=#717f62]\n\nI. ОСНОВНАЯ ИНФОРМАЦИЯ\n\nИмя Фамилия:\n\n[a]${formData.get('fullname')}[/a]\n\n\n\nДата рождения:\n\n[a]${formData.get('birthdate')}[/a]\n\n\n\nПол:\n\n[a]${formData.get('gender')}[/a]\n\n\n\nНомер телефона:\n\n[a]${formData.get('phone')}[/a]\n\n\n\nАдрес проживания:\n\n[a]${formData.get('address')}[/a]\n\n\n\nII. ОСНОВНЫЕ ВОПРОСЫ\n\nРасовая/этническая принадлежность:\n\n[a]${formData.get('ethnicity')}[/a]\n\n\n\nЮридический статус вашего нахождения в стране (оставить один пункт):\n\n[a]${formData.get('legal_status')}[/a][a][/a]\n\n\n\nВаше образование (оставить один пункт):\n\n[a]${formData.get('education')}[/a][a][/a]\n\n\n\nИстория Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды):\n\n[a]${formData.get('criminal_history')}[/a]\n\n\n\nРазрешения и лицензии:\n\n[a]${formData.get('licenses')}[/a]\n\n\n\nПочему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов)\n\n[a]${formData.get('why_you')}[/a]\n\n\n\n\n\nДата: ${formattedDate}\n\nПодпись: ${formData.get('signature')}\n\n\n\n\n\n(( III. OOC Часть ))\n\n\n\nИмя\n\n[a]${formData.get('ooc_name')}[/a]\n\nВозраст\n\n[a]${formData.get('ooc_age')}[/a]\n\nЧасовой пояс\n\n[a]${formData.get('timezone')}[/a]\n\nПослужной список (фракции, их лидеры, должность и звание, дата и причина ухода)\n\n[a]${formData.get('faction_history')}[/a]\n\n\n\nСсылка на страницу в ВКонтакте (ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА)\n\n[a]${formData.get('vk_link')}[/a]\n\nCcылка на форумный аккаунт сервера (forum.gambit-rp.ru; профиль должен быть открыт)\n\n[a]${formData.get('forum_link')}[/a]\n\nПолный, необрезанный скриншот из личного кабинета всех персонажей на сервере Gambit RP\n\n[a]${formData.get('screenshot_chars')}[/a]\n\nСкриншот-подтверждение включённой двухфакторной аутентификации:\n\n[a]${formData.get('screenshot_2fa')}[/a]\n\nДоказательства игры (топики, СС; необязательно из полицейских фракций):\n\n[a]${formData.get('game_proof') || 'Не предоставлено'}[/a]\n\n\n\nИмеется ли доступ к TeamSpeak 3?:\n\n[a]${formData.get('teamspeak')}[/a]\n\n\n\nИмеется ли возможность беспрепятственно общатся в нём(микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3)?\n\n[a]${formData.get('teamspeak_communication')}[/a]\n\n\n\nКвента персонажа:\n\n[a]${formData.get('character_story')}[/a]\n\n\n\n[hr][/hr]\n\n(( Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции.\n\n\n\nВсё вышеуказанное мной является абсолютной правдой, которую заполнял лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции. ))\n\n\n\n[/box][groups]`;
+                
+                document.getElementById('bbcode-output').textContent = bbcode;
+                document.querySelector('.output-container').style.display = 'block';
+                
+                document.querySelector('.output-container').scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            document.getElementById('copy-btn').addEventListener('click', function() {
+                const bbcodeOutput = document.getElementById('bbcode-output');
+                const textArea = document.createElement('textarea');
+                textArea.value = bbcodeOutput.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                alert('BB-код скопирован в буфер обмена!');
+            });
+            
+            const today = new Date();
+            const formattedToday = today.toISOString().substr(0, 10);
+            document.getElementById('application_date').value = formattedToday;
+            
+            const themeToggle = document.getElementById('theme-toggle');
+            let isDarkTheme = true;
+            
+            themeToggle.addEventListener('click', function() {
+                isDarkTheme = !isDarkTheme;
+                
+                if (isDarkTheme) {
+                    document.documentElement.style.setProperty('--primary-color', '#6d8a6f');
+                    document.documentElement.style.setProperty('--primary-light', '#3d4d3e');
+                    document.documentElement.style.setProperty('--secondary-color', '#2a2d2a');
+                    document.documentElement.style.setProperty('--background-color', '#1e201e');
+                    document.documentElement.style.setProperty('--surface-color', '#242724');
+                    document.documentElement.style.setProperty('--border-color', '#3a403a');
+                    document.documentElement.style.setProperty('--text-color', '#e2e8e2');
+                    document.documentElement.style.setProperty('--text-light', '#a0b0a0');
+                    document.documentElement.style.setProperty('--hover-color', '#354135');
+                    themeToggle.textContent = 'Светлая тема';
+                } else {
+                    document.documentElement.style.setProperty('--primary-color', '#4a5c45');
+                    document.documentElement.style.setProperty('--primary-light', '#e9efe7');
+                    document.documentElement.style.setProperty('--secondary-color', '#f8f9fa');
+                    document.documentElement.style.setProperty('--background-color', '#f9f9f9');
+                    document.documentElement.style.setProperty('--surface-color', '#ffffff');
+                    document.documentElement.style.setProperty('--border-color', '#dee2e6');
+                    document.documentElement.style.setProperty('--text-color', '#2d3436');
+                    document.documentElement.style.setProperty('--text-light', '#636e72');
+                    document.documentElement.style.setProperty('--hover-color', '#e5e9ec');
+                    themeToggle.textContent = 'Тёмная тема';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
