@@ -373,6 +373,14 @@
             border-left: 3px solid var(--primary-color);
             display: none;
         }
+        
+        .agreement-text {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-left: 25px;
+            margin-top: 5px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -427,7 +435,7 @@
                 </div>
                 
                 <div class="button-group">
-                    <div></div> <!-- Empty div for spacing -->
+                    <div></div>
                     <button type="button" class="next-tab" data-next="questions">Далее →</button>
                 </div>
             </div>
@@ -565,6 +573,16 @@
                         <label for="character_story">Квента персонажа: <span class="required">*</span></label>
                         <textarea id="character_story" name="character_story" required></textarea>
                     </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="agreement" name="agreement" required> <span class="required">*</span> Я подтверждаю согласие с условиями</label>
+                        </div>
+                        <div class="agreement-text">
+                            Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции.<br><br>
+                            Всё вышеуказанное мной является абсолютной правдой, на которую соглашался лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции.
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="button-group">
@@ -676,6 +694,16 @@
                     }
                 });
                 
+                const agreementCheckbox = document.getElementById('agreement');
+                if (!agreementCheckbox.checked) {
+                    alert('Вы должны подтвердить согласие с условиями перед генерацией заявки!');
+                    document.querySelector('.tab[data-tab="ooc"]').click();
+                    agreementCheckbox.style.outline = '2px solid var(--error-color)';
+                    return;
+                } else {
+                    agreementCheckbox.style.outline = '';
+                }
+                
                 const whyYouWords = document.getElementById('why_you').value.trim().split(/\s+/).length;
                 if (whyYouWords < 70) {
                     alert('Ответ на вопрос "Почему мы должны взять именно Вас?" должен содержать не менее 70 слов!');
@@ -703,68 +731,44 @@
                 
                 document.getElementById('topic-output').style.display = 'block';
                 
-                let bbcode = `[groups=8][box=#FFFFFF]\n\n[/box][box=#FFFFFF]\n\n[INDENT=3][IMG]https://i.imgur.com/aGHQgq3.png[/IMG][/INDENT]\n\n[CENTER]\n\n\n\n[color=#000000][B]КОМАНДЫВАНИЮ ПЕРСОНАЛОМ ЛССД\n\nТРЕНИРОВОЧНОЕ БЮРО\n\nАКАДЕМИЯ ПОМОЩНИКА ШЕРИФА[/color][/B][/CENTER]\n\n\n\n[box=#717f62]\n\nI. ОСНОВНАЯ ИНФОРМАЦИЯ\n\nИмя Фамилия:\n\n[a]${formData.get('fullname')}[/a]\n\n\n\nДата рождения:\n\n[a]${formData.get('birthdate')}[/a]\n\n\n\nПол:\n\n[a]${formData.get('gender')}[/a]\n\n\n\nНомер телефона:\n\n[a]${formData.get('phone')}[/a]\n\n\n\nАдрес проживания:\n\n[a]${formData.get('address')}[/a]\n\n\n\nII. ОСНОВНЫЕ ВОПРОСЫ\n\nРасовая/этническая принадлежность:\n\n[a]${formData.get('ethnicity')}[/a]\n\n\n\nЮридический статус вашего нахождения в стране (оставить один пункт):\n\n[a]${formData.get('legal_status')}[/a][a][/a]\n\n\n\nВаше образование (оставить один пункт):\n\n[a]${formData.get('education')}[/a][a][/a]\n\n\n\nИстория Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды):\n\n[a]${formData.get('criminal_history')}[/a]\n\n\n\nРазрешения и лицензии:\n\n[a]${formData.get('licenses')}[/a]\n\n\n\nПочему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов)\n\n[a]${formData.get('why_you')}[/a]\n\n\n\n\n\nДата: ${formattedDate}\n\nПодпись: ${formData.get('signature')}\n\n\n\n\n\n(( III. OOC Часть ))\n\n\n\nИмя\n\n[a]${formData.get('ooc_name')}[/a]\n\nВозраст\n\n[a]${formData.get('ooc_age')}[/a]\n\nЧасовой пояс\n\n[a]${formData.get('timezone')}[/a]\n\nПослужной список (фракции, их лидеры, должность и звание, дата и причина ухода)\n\n[a]${formData.get('faction_history')}[/a]\n\n\n\nСсылка на страницу в ВКонтакте (ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА)\n\n[a]${formData.get('vk_link')}[/a]\n\nCcылка на форумный аккаунт сервера (forum.gambit-rp.ru; профиль должен быть открыт)\n\n[a]${formData.get('forum_link')}[/a]\n\nПолный, необрезанный скриншот из личного кабинета всех персонажей на сервере Gambit RP\n\n[a]${formData.get('screenshot_chars')}[/a]\n\nСкриншот-подтверждение включённой двухфакторной аутентификации:\n\n[a]${formData.get('screenshot_2fa')}[/a]\n\nДоказательства игры (топики, СС; необязательно из полицейских фракций):\n\n[a]${formData.get('game_proof') || 'Не предоставлено'}[/a]\n\n\n\nИмеется ли доступ к TeamSpeak 3?:\n\n[a]${formData.get('teamspeak')}[/a]\n\n\n\nИмеется ли возможность беспрепятственно общатся в нём(микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3)?\n\n[a]${formData.get('teamspeak_communication')}[/a]\n\n\n\nКвента персонажа:\n\n[a]${formData.get('character_story')}[/a]\n\n\n\n[hr][/hr]\n\n(( Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции.\n\n\n\nВсё вышеуказанное мной является абсолютной правдой, которую заполнял лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции. ))\n\n\n\n[/box][groups]`;
+                let bbcode = `[groups=8][box=#FFFFFF]\n\n[/box][box=#FFFFFF]\n\n[INDENT=3][IMG]https://i.imgur.com/aGHQgq3.png[/IMG][/INDENT]\n\n[CENTER]\n\n\n\n[color=#000000][B]КОМАНДЫВАНИЮ ПЕРСОНАЛОМ ЛССД\n\nТРЕНИРОВОЧНОЕ БЮРО\n\nАКАДЕМИЯ ПОМОЩНИКА ШЕРИФА[/color][/B][/CENTER]\n\n\n\n[box=#717f62]\n\nI. ОСНОВНАЯ ИНФОРМАЦИЯ\n\nИмя Фамилия:\n\n[a]${formData.get('fullname')}[/a]\n\n\n\nДата рождения:\n\n[a]${formData.get('birthdate')}[/a]\n\n\n\nПол:\n\n[a]${formData.get('gender')}[/a]\n\n\n\nНомер телефона:\n\n[a]${formData.get('phone')}[/a]\n\n\n\nАдрес проживания:\n\n[a]${formData.get('address')}[/a]\n\n\n\nII. ОСНОВНЫЕ ВОПРОСЫ\n\nРасовая/этническая принадлежность:\n\n[a]${formData.get('ethnicity')}[/a]\n\n\n\nЮридический статус вашего нахождения в стране (оставить один пункт):\n\n[a]${formData.get('legal_status')}[/a][a][/a]\n\n\n\nВаше образование (оставить один пункт):\n\n[a]${formData.get('education')}[/a][a][/a]\n\n\n\nИстория Ваших правонарушений (штрафы, аресты, фиксация биометрических данных сотрудниками правоохранительных органов, суды):\n\n[a]${formData.get('criminal_history')}[/a]\n\n\n\nРазрешения и лицензии:\n\n[a]${formData.get('licenses')}[/a]\n\n\n\nПочему мы должны взять именно Вас? (Развёрнутый ответ, мин. 70 слов)\n\n[a]${formData.get('why_you')}[/a]\n\n\n\n\n\nДата: ${formattedDate}\n\nПодпись: ${formData.get('signature')}\n\n\n\n\n\n(( III. OOC Часть ))\n\n\n\nИмя\n\n[a]${formData.get('ooc_name')}[/a]\n\nВозраст\n\n[a]${formData.get('ooc_age')}[/a]\n\nЧасовой пояс\n\n[a]${formData.get('timezone')}[/a]\n\nПослужной список (фракции, их лидеры, должность и звание, дата и причина ухода)\n\n[a]${formData.get('faction_history')}[/a]\n\n\n\nСсылка на страницу в ВКонтакте (ОБРАТИТЕ ВНИМАНИЕ НА ТО, ЧТО ВАША СТРАНИЦА ДОЛЖНА БЫТЬ ОТКРЫТА)\n\n[a]${formData.get('vk_link')}[/a]\n\nCcылка на форумный аккаунт сервера (forum.gambit-rp.ru; профиль должен быть открыт)\n\n[a]${formData.get('forum_link')}[/a]\n\nПолный, необрезанный скриншот из личного кабинета всех персонажей на сервере Gambit RP\n\n[a]${formData.get('screenshot_chars')}[/a]\n\nСкриншот-подтверждение включённой двухфакторной аутентификации:\n\n[a]${formData.get('screenshot_2fa')}[/a]\n\nДоказательства игры (топики, СС; необязательно из полицейских фракций):\n\n[a]${formData.get('game_proof') || 'Не предоставлено'}[/a]\n\n\n\nИмеется ли доступ к TeamSpeak 3?:\n\n[a]${formData.get('teamspeak')}[/a]\n\n\n\nИмеется ли возможность беспрепятственно общатся в нём(микрофон, либо возможность покупки TeamSpeak 3 на телефон, главное чтобы могли общаться в TS3)?\n\n[a]${formData.get('teamspeak_communication')}[/a]\n\n\n\nКвента персонажа:\n\n[a]${formData.get('character_story')}[/a]\n\n\n\n[hr][/hr]\n\n(( Отправляя данную заявку, я соглашаюсь с тем, что ознакомлен с правилами приёма во фракцию Los Santos County Sheriff's Departament. Я понимаю, что если покину фракцию в течении 20 дней, после получения инвайта на игрового персонажа, то я могу не получить статус "Retired", что повлияет на моё будущее восстановление во фракцию. В случае слива информации с форума SA-ES/официального Discord сервера фракции я буду занесён в Чёрный список SA-ES. После одобрения моей заявки я обязуюсь изучить всю информацию на форуме, включая мануал и правила фракции, и понимаю, что могу быть уволен за несоблюдение правил фракции. ))\n\n\n\n(( Всё вышеуказанное мной является абсолютной правдой, на которую соглашался лично я. В случае, если это неправда - я осознаю, что могу получить чёрный список фракции. ))\n\n[/box]\n\n[/box][/groups]`;
                 
                 document.getElementById('bbcode-output').textContent = bbcode;
                 document.querySelector('.output-container').style.display = 'block';
-                
                 document.getElementById('instructions').style.display = 'block';
                 
-                document.querySelector('.topic-output').scrollIntoView({ behavior: 'smooth' });
+                document.querySelector('.output-container').scrollIntoView({ behavior: 'smooth' });
             });
             
             document.getElementById('copy-btn').addEventListener('click', function() {
                 const bbcodeOutput = document.getElementById('bbcode-output');
-                const textArea = document.createElement('textarea');
-                textArea.value = bbcodeOutput.textContent;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                
-                alert('BB-код скопирован в буфер обмена!');
+                navigator.clipboard.writeText(bbcodeOutput.textContent).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Скопировано!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 2000);
+                });
             });
             
             document.getElementById('copy-title-btn').addEventListener('click', function() {
                 const topicTitle = document.getElementById('topic-title');
-                const textArea = document.createElement('textarea');
-                textArea.value = topicTitle.textContent;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                
-                alert('Название темы скопировано в буфер обмена!');
+                navigator.clipboard.writeText(topicTitle.textContent).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Скопировано!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 2000);
+                });
             });
             
-            const today = new Date();
-            const formattedToday = today.toISOString().substr(0, 10);
-            document.getElementById('application_date').value = formattedToday;
-            
-            const themeToggle = document.getElementById('theme-toggle');
-            let isDarkTheme = false;
-            
-            themeToggle.addEventListener('click', function() {
-                isDarkTheme = !isDarkTheme;
-                
-                if (isDarkTheme) {
-                    document.documentElement.style.setProperty('--background-color', '#1a1a1a');
-                    document.documentElement.style.setProperty('--surface-color', '#2a2a2a');
-                    document.documentElement.style.setProperty('--secondary-color', '#333333');
-                    document.documentElement.style.setProperty('--border-color', '#444444');
-                    document.documentElement.style.setProperty('--text-color', '#ffffff');
-                    document.documentElement.style.setProperty('--text-light', '#cccccc');
-                    document.documentElement.style.setProperty('--hover-color', '#444444');
-                    themeToggle.textContent = 'Светлая тема';
+            document.getElementById('theme-toggle').addEventListener('click', function() {
+                if (document.body.classList.contains('dark-theme')) {
+                    document.body.classList.remove('dark-theme');
+                    this.textContent = 'Тёмная тема';
                 } else {
-                    document.documentElement.style.setProperty('--background-color', '#ffffff');
-                    document.documentElement.style.setProperty('--surface-color', '#fafafa');
-                    document.documentElement.style.setProperty('--secondary-color', '#f5f5f5');
-                    document.documentElement.style.setProperty('--border-color', '#dddddd');
-                    document.documentElement.style.setProperty('--text-color', '#333333');
-                    document.documentElement.style.setProperty('--text-light', '#666666');
-                    document.documentElement.style.setProperty('--hover-color', '#e0e0e0');
-                    themeToggle.textContent = 'Тёмная тема';
+                    document.body.classList.add('dark-theme');
+                    this.textContent = 'Светлая тема';
                 }
             });
         });
